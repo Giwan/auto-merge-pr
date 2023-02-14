@@ -7964,66 +7964,28 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.mergePullRequest = exports.getPullRequestId = exports.getOwnerAndRepo = exports.getInput = void 0;
+exports.getOwnerAndRepo = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const core_1 = __nccwpck_require__(6762);
 const getErrorMessage_1 = __nccwpck_require__(7182);
 const getOctokitInstance_1 = __nccwpck_require__(8131);
-const getInput = function (core) {
-    return {
-        token: core.getInput('token'),
-        repository: core.getInput('repository'),
-        pullRequestNumber: Number(core.getInput('pull-request-number', { required: true })),
-        mergeMethod: core.getInput('merge-method')
-    };
-};
-exports.getInput = getInput;
+const getInput_1 = __nccwpck_require__(7193);
+const getPullRequestId_1 = __nccwpck_require__(81);
+const mergePullRequest_1 = __nccwpck_require__(8867);
 const getOwnerAndRepo = function (repository) {
     return repository.split('/');
 };
 exports.getOwnerAndRepo = getOwnerAndRepo;
-const getPullRequestId = function (octokit, owner, repo, pullRequestNumber) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const params = {
-            owner,
-            repo,
-            pullRequestNumber
-        };
-        const query = `query GetPullRequestId($owner: String!, $repo: String!, $pullRequestNumber: Int!) {
-        repository(owner: $owner, name: $repo) {
-            id
-        }
-    }`;
-        const response = yield octokit.graphql(query, params);
-        return response.repository.pullRequest.id;
-    });
-};
-exports.getPullRequestId = getPullRequestId;
-const mergePullRequest = function (octokit, pullRequestId, mergeMethod = 'SQUASH') {
-    return __awaiter(this, void 0, void 0, function* () {
-        const params = {
-            pullRequestId,
-            mergeMethod
-        };
-        const query = `mutation mergePullRequest($pullRequestId: ID!) {
-        mergePullRequest(input: { pullRequestId: $pullRequestId }) {
-            clientMutationId
-        }
-    }`;
-        octokit.graphql(query, params);
-    });
-};
-exports.mergePullRequest = mergePullRequest;
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const inputs = (0, exports.getInput)(core);
+            const inputs = (0, getInput_1.getInput)(core);
             core.debug(`inputs ${inputs}`);
             const [owner, repo] = (0, exports.getOwnerAndRepo)(inputs.repository);
             const octokitInstance = (0, getOctokitInstance_1.getOctokitInstance)(core_1.Octokit, inputs);
-            const pullRequestId = yield (0, exports.getPullRequestId)(octokitInstance, owner, repo, inputs.pullRequestNumber);
+            const pullRequestId = yield (0, getPullRequestId_1.getPullRequestId)(octokitInstance, owner, repo, inputs.pullRequestNumber);
             core.debug(`Pull Request Id: ${pullRequestId}`);
-            (0, exports.mergePullRequest)(octokitInstance, pullRequestId, inputs.mergeMethod);
+            (0, mergePullRequest_1.mergePullRequest)(octokitInstance, pullRequestId, inputs.mergeMethod);
         }
         catch (error) {
             core.setFailed((0, getErrorMessage_1.getErrorMessage)(error));
@@ -8050,6 +8012,26 @@ exports.getErrorMessage = getErrorMessage;
 
 /***/ }),
 
+/***/ 7193:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getInput = void 0;
+const getInput = function (core) {
+    return {
+        token: core.getInput('token'),
+        repository: core.getInput('repository'),
+        pullRequestNumber: Number(core.getInput('pull-request-number', { required: true })),
+        mergeMethod: core.getInput('merge-method')
+    };
+};
+exports.getInput = getInput;
+
+
+/***/ }),
+
 /***/ 8131:
 /***/ ((__unused_webpack_module, exports) => {
 
@@ -8068,6 +8050,78 @@ const getOctokitInstance = function (Octokit, inputs) {
     });
 };
 exports.getOctokitInstance = getOctokitInstance;
+
+
+/***/ }),
+
+/***/ 81:
+/***/ (function(__unused_webpack_module, exports) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getPullRequestId = void 0;
+const getPullRequestId = function (octokit, owner, repo, pullRequestNumber) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const params = {
+            owner,
+            repo,
+            pullRequestNumber
+        };
+        const query = `query GetPullRequestId($owner: String!, $repo: String!, $pullRequestNumber: Int!) {
+        repository(owner: $owner, name: $repo) {
+            id
+        }
+    }`;
+        const response = yield octokit.graphql(query, params);
+        return response.repository.pullRequest.id;
+    });
+};
+exports.getPullRequestId = getPullRequestId;
+
+
+/***/ }),
+
+/***/ 8867:
+/***/ (function(__unused_webpack_module, exports) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.mergePullRequest = void 0;
+const mergePullRequest = function (octokit, pullRequestId, mergeMethod = 'SQUASH') {
+    return __awaiter(this, void 0, void 0, function* () {
+        const params = {
+            pullRequestId,
+            mergeMethod
+        };
+        const query = `mutation mergePullRequest($pullRequestId: ID!) {
+        mergePullRequest(input: { pullRequestId: $pullRequestId }) {
+            clientMutationId
+        }
+    }`;
+        octokit.graphql(query, params);
+    });
+};
+exports.mergePullRequest = mergePullRequest;
 
 
 /***/ }),
