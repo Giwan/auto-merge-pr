@@ -17,11 +17,13 @@ export const getPullRequestId = async function (octokit: TOctokit, owner: string
         pullRequestNumber
     }
 
-    const query = `query GetPullRequestId($owner: String!, $repo: String!, $pullRequestNumber: Int!) {
+    const query = `query GetPullRequestId($owner: String!, $repo: String! $pullRequestNumber: Int!) {
         repository(owner: $owner, name: $repo) {
+          pullRequest(number: $pullRequestNumber) {
             id
+          }
         }
-    }`;
+      }`;
 
     const response = await octokit.graphql<GetPullRequestIdResponse>(query, params);
     return response.repository.pullRequest.id;

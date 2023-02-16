@@ -8077,11 +8077,13 @@ const getPullRequestId = function (octokit, owner, repo, pullRequestNumber) {
             repo,
             pullRequestNumber
         };
-        const query = `query GetPullRequestId($owner: String!, $repo: String!, $pullRequestNumber: Int!) {
+        const query = `query GetPullRequestId($owner: String!, $repo: String! $pullRequestNumber: Int!) {
         repository(owner: $owner, name: $repo) {
+          pullRequest(number: $pullRequestNumber) {
             id
+          }
         }
-    }`;
+      }`;
         const response = yield octokit.graphql(query, params);
         return response.repository.pullRequest.id;
     });
